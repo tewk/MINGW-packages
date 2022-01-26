@@ -25,8 +25,8 @@ _show_log_lockup_info=0   # 0 or 1    (PR value is 0)
 _realname=julia
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.4.1
-pkgrel=3
+pkgver=1.7.1
+pkgrel=1
 _rc=
 _sourcedir=${_realname}-${pkgver}${_rc}
 pkgdesc="High-level, high-performance, dynamic programming language for technical computing (mingw-w64)"
@@ -63,8 +63,10 @@ source=(${_sourcedir}.tar.gz::https://github.com/JuliaLang/julia/releases/downlo
         017-1.4.1-backport-1.4.2-Add-GCC10-to-GCC-version-mappings-35849.patch
         018-1.4.1-llvm-8.0.1-D64937-gcc10.patch
         019-1.4.1-port-nl-libgit2-v0.99.0.patch
+	021-fix-dep-libs.patch
        )
-sha256sums=('71709a1e04f4f4ac54668cc32530a7d36062ee890fafbcba8dec178987fa0a0c'
+sha256sums=(#'71709a1e04f4f4ac54668cc32530a7d36062ee890fafbcba8dec178987fa0a0c'
+	    'SKIP'
             'b9a82888f79ce2786a68919b37eb52f0dd44cbac53dd49a6e95401916fa4edd2'
             '221023d4ebf2721a9b5cedbc6a3550c26c3c9897f5332a6ea4a68ec1f1510b05'
             '75187094bda0c52d90e5ae9fc3fe170f23ad745d5a1debe762d7da010b9df830'
@@ -76,7 +78,8 @@ sha256sums=('71709a1e04f4f4ac54668cc32530a7d36062ee890fafbcba8dec178987fa0a0c'
             '9ad3bd47d1b9f30bb42346495eca012e9be74e626d008a80882be3f5e30af91a'
             '93e32c0143ca3fb6392608e1cb8c0564a703b76d09996d29ec74f7f7e56d3936'
             '7128c1e721cf39c357096efe975e7eaf5de4d0d5bac763fb929f85309fedf742'
-            'c8be2be8d62ea653439a5c18e56f8026c83f0f1127934b12d7faf60630befd45')
+            'c8be2be8d62ea653439a5c18e56f8026c83f0f1127934b12d7faf60630befd45'
+    	    'SKIP')
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -121,23 +124,29 @@ USE_SYSTEM_LAPACK = 1
 EOF
 }
 
+
 prepare() {
   cd "${srcdir}/${_sourcedir}"
 
   rm -f deps/patches/llvm-8.0.1-D64937-gcc10.patch
 
+	  #008-1.1.1-msys2-fix-i686-gcc-dll-name.patch \
+	  #012-1.1.1-gcc-remove-USING_SJLJ_EXCEPTIONS.patch \
+	  #015-1.1.1-mingw-use-O2-instead-of-O3.patch \
+	  #017-1.4.1-backport-1.4.2-Add-GCC10-to-GCC-version-mappings-35849.patch \
+	  #018-1.4.1-llvm-8.0.1-D64937-gcc10.patch
+
+  #apply_patch_with_msg \
+  #	  003-1.1.1-msys2-fix-CMAKE_GENERATOR_COMMAND-and-CMAKE_C_COMPILER.patch \
+  #	  004-1.1.1-msys2-fix-base-floatfuncs.jl.patch \
+  #	  007-1.3.0-pkgbuild-make-install-no-build.patch \
+  #	  009-1.1.1-msys2-find-modname-in-julia_dl-before-default-paths.patch \
+  #	  010-1.3.0-msys2-fix-install-dir.patch \
+  #	  016-1.3.0-msys2-Add-SRCCACHE-LIBGIT2_SRC_DIR-source-extracted-target.patch \
+  #
+
   apply_patch_with_msg \
-    003-1.1.1-msys2-fix-CMAKE_GENERATOR_COMMAND-and-CMAKE_C_COMPILER.patch \
-    004-1.1.1-msys2-fix-base-floatfuncs.jl.patch \
-    007-1.3.0-pkgbuild-make-install-no-build.patch \
-    008-1.1.1-msys2-fix-i686-gcc-dll-name.patch \
-    009-1.1.1-msys2-find-modname-in-julia_dl-before-default-paths.patch \
-    010-1.3.0-msys2-fix-install-dir.patch \
-    012-1.1.1-gcc-remove-USING_SJLJ_EXCEPTIONS.patch \
-    015-1.1.1-mingw-use-O2-instead-of-O3.patch \
-    016-1.3.0-msys2-Add-SRCCACHE-LIBGIT2_SRC_DIR-source-extracted-target.patch \
-    017-1.4.1-backport-1.4.2-Add-GCC10-to-GCC-version-mappings-35849.patch \
-    018-1.4.1-llvm-8.0.1-D64937-gcc10.patch
+	021-fix-dep-libs.patch
 
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   msg2 "directory copy starting"

@@ -71,7 +71,10 @@ build() {
   	  case ${build} in
     		*o) strip -S *.a ;;
   	  esac
-  		gcc -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o lib${_realname}-${build}.dll -Wl,--out-implib,lib${_realname}.dll.a -Wl,--whole-archive lib${_realname}.a -Wl,--no-whole-archive $(pkg-config msmpi openblas petsc-${build} --libs)
+  		#gcc -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o lib${_realname}-${build}.dll -Wl,--out-implib,lib${_realname}.dll.a -Wl,--whole-archive lib${_realname}.a -Wl,--no-whole-archive $(pkg-config msmpi openblas petsc-${build} --libs)
+  		ar crsT ${lib}.a libslepcnep.a libslepcpep.a libslepcsvd.a libslepceps.a libslepcmfn.a libslepclme.a libslepcsys.a
+  		gcc -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o ${lib}.dll -Wl,--output-def,${lib}.def -Wl,--out-implib,${lib}.dll.a -Wl,--whole-archive ${lib}.a -Wl,--no-whole-archive $(pkg-config msmpi openblas scalapack petsc-${build} --libs)
+		dlltool -d ${lib}.def --dllname ${lib}.dll --output-lib ${lib}.dll.a --temp-prefix $lib-
   	)
   done
 }

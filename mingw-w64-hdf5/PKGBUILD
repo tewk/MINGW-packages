@@ -25,9 +25,11 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
              )
 options=('staticlibs' 'strip')
 source=("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${_ver%.*}/hdf5-${_ver}${patch}/src/hdf5-${_ver}${patch}.tar.bz2"
+	"link_props.patch"
         "hdf5-proper-library-names-mingw.patch"
         "hdf5-fix-find-szip.patch")
 sha256sums=('aaf9f532b3eda83d3d3adc9f8b40a9b763152218fa45349c3bc77502ca1f8f1c'
+	    'SKIP'
             '7b5595ee9903e14f147f7b4615648cad6a0f5a76f8299461ebe91d739e750476'
             '1a778a273225c36589b8874deb71caedbd76f2704ff39948b7a2b4d5f977b529')
 
@@ -44,6 +46,7 @@ prepare() {
   cd "${srcdir}/${_realname}-${_ver}${patch}"
 
   apply_patch_with_msg \
+    link_props.patch \
     hdf5-proper-library-names-mingw.patch \
     hdf5-fix-find-szip.patch
 }
@@ -81,7 +84,9 @@ build() {
       -DHDF5_MSVC_NAMING_CONVENTION=OFF \
       ../${_realname}-${_ver}${patch}
 
-  cmake --build .
+  #cmake --build .
+  ninja -v
+  dlltool --def hdf5-shared.def --dllname bin/libhdf5-0.dll --output-lib lib/libhdf5.dll.a
 }
 
 package() {

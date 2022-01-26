@@ -1,0 +1,33 @@
+236c236,244
+< target_link_libraries(superlu PUBLIC ${BLAS_LIB})
+---
+> 
+> if(MSYS_PATCHES)
+>   target_link_libraries(superlu PUBLIC
+>           $<BUILD_INTERFACE:${BLAS_LIB}>
+>   )
+> else()
+>   target_link_libraries(superlu PUBLIC ${BLAS_LIB})
+> endif()
+> 
+243a252,271
+> 
+> if(MSYS_PATCHES)
+> # create the def so that later we can use it to make a dll that can be linked by msvc
+>   set(DEF_FILE "superlu.def")
+>   target_link_options(superlu PRIVATE "LINKER:--output-def=${DEF_FILE}")
+>   find_program(DLLTOOL NAMES "dlltool.exe")
+> 
+> # Note that this will clobber the output of -out-implib from the link stage of superlu
+> # but this is needed to to avoid linking issues with msvc where the IAT of the dll becomes jumbled
+> 
+> #  set(IMPLIB_FILE "libsuperlu.dll.lib")
+> #  add_custom_command(OUTPUT "${IMPLIB_FILE}" 
+> #	COMMAND "${DLLTOOL} --dllname libsuperlu.dll -d ${DEF_FILE} --output-lib ${IMPLIB_FILE} --temp-prefix superlu-"
+> #	DEPENDS superlu
+> #	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+> #   	VERBATIM 
+> #   	)
+> #  add_custom_target(superlu_implib ALL DEPENDS "${IMPLIB_FILE}")
+> endif()
+> 
