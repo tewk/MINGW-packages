@@ -86,7 +86,9 @@ build() {
 
   #cmake --build .
   ninja -v
-  dlltool --def hdf5-shared.def --dllname bin/libhdf5-0.dll --output-lib lib/libhdf5.dll.a
+  cd bin
+  gendef.exe libhdf5-0.dll
+  dlltool --def libhdf5-0.def --dllname libhdf5-0.dll --output-lib libhdf5.dll.a
 }
 
 package() {

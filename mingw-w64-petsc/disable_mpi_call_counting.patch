@@ -1,0 +1,71 @@
+diff --git a/config/BuildSystem/config/packages/MPI.py b/config/BuildSystem/config/packages/MPI.py
+index 81a79d6954e..089471b9b72 100644
+--- a/config/BuildSystem/config/packages/MPI.py
++++ b/config/BuildSystem/config/packages/MPI.py
+@@ -14,7 +14,7 @@ class Configure(config.package.Package):
+     config.package.Package.__init__(self, framework)
+     self.minversion         = '2'
+     self.versionname        = 'MPI_VERSION'
+-    self.functions          = ['MPI_Init', 'MPI_Comm_create']
++    self.functions          = []
+     self.includes           = ['mpi.h']
+     liblist_mpich         = [['fmpich2.lib','fmpich2g.lib','fmpich2s.lib','mpi.lib'],
+                              ['fmpich2.lib','fmpich2g.lib','mpi.lib'],['fmpich2.lib','mpich2.lib'],
+@@ -419,6 +419,8 @@ Unable to run hostname to check the network')
+     # flag broken one-sided tests
+     if not 'HAVE_MSMPI' in self.defines and not (hasattr(self, 'mpich_numversion') and int(self.mpich_numversion) <= 30004300) and not (hasattr(self, 'isNecMPI')):
+       self.addDefine('HAVE_MPI_ONE_SIDED', 1)
++    for f in '''MPI_Comm_spawn MPI_Type_get_envelope MPI_Type_get_extent MPI_Type_dup MPI_Init_thread MPI_Finalized MPI_Exscan'''.split():
++      self.addDefine('HAVE_' + f.upper(),1)
+     self.compilers.CPPFLAGS = oldFlags
+     self.compilers.LIBS = oldLibs
+     self.logWrite(self.framework.restoreLog())
+diff --git a/include/petsclog.h b/include/petsclog.h
+index 75ed75efc86..62d8ddf9a0d 100644
+--- a/include/petsclog.h
++++ b/include/petsclog.h
+@@ -471,7 +471,7 @@ PETSC_EXTERN PetscErrorCode PetscLogEventZeroFlops(PetscLogEvent);
+ 
+      It does not work with Windows because winmpich lacks MPI_Type_size()
+ */
+-#if !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined (PETSC_HAVE_MPI_MISSING_TYPESIZE)
++#if 0 && !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined (PETSC_HAVE_MPI_MISSING_TYPESIZE)
+ /*
+    Logging of MPI activities
+ */
+diff --git a/src/sys/logging/xmllogevent.c b/src/sys/logging/xmllogevent.c
+index 63678b0ca83..7e0e1e0a446 100644
+--- a/src/sys/logging/xmllogevent.c
++++ b/src/sys/logging/xmllogevent.c
+@@ -1541,13 +1541,13 @@ PetscErrorCode PetscLogView_Flamegraph(PetscViewer viewer)
+
+ PETSC_EXTERN PetscErrorCode PetscASend(int count, int datatype)
+ {
+-#if !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
++#if 0 && !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
+   PetscErrorCode ierr;
+ #endif
+
+   PetscFunctionBegin;
+   petsc_send_ct++;
+-#if !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
++#if 0 && !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
+   ierr = PetscMPITypeSize(count,MPI_Type_f2c((MPI_Fint) datatype),&petsc_send_len);CHKERRQ(ierr);
+ #endif
+   PetscFunctionReturn(0);
+@@ -1555,13 +1555,13 @@ PETSC_EXTERN PetscErrorCode PetscASend(int count, int datatype)
+
+ PETSC_EXTERN PetscErrorCode PetscARecv(int count, int datatype)
+ {
+-#if !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
++#if 0 && !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
+   PetscErrorCode ierr;
+ #endif
+
+   PetscFunctionBegin;
+   petsc_recv_ct++;
+-#if !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
++#if 0 && !defined(MPIUNI_H) && !defined(PETSC_HAVE_BROKEN_RECURSIVE_MACRO) && !defined(PETSC_HAVE_MPI_MISSING_TYPESIZE)
+   ierr = PetscMPITypeSize(count,MPI_Type_f2c((MPI_Fint) datatype),&petsc_recv_len);CHKERRQ(ierr);
+ #endif
+   PetscFunctionReturn(0);

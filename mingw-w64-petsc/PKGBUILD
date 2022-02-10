@@ -59,7 +59,8 @@ source=("git+https://gitlab.com/petsc/petsc.git"
         'tclbuildtest.tcl'
         'petsc.test'
         'petsc-mat.test'
-        '0001-mpi-detection-override.patch')
+        '0001-mpi-detection-override.patch'
+        'disable_mpi_call_counting.patch')
 noextract=("${_realname}-lite-${pkgver}.tar.gz")
 sha256sums=('SKIP'
 	    #'909cf7bce7b6a0ddb2580a1ac9502aa01631ec4105c716594c1804f0ee1ea06a'
@@ -67,7 +68,8 @@ sha256sums=('SKIP'
             '15c7af25b91406d5fe5f26cfe00963b6cfde1c3dd466eb25f1b6fae299934966'
             '9662cc4104726c714f7961aba6f8c93bfb85f3d3f89b4908b0a55aedab41ca31'
             'fc95ca4ddc138d288f047835a68a84a11cb841c6cca146c6ef7d7e63e0836b1a'
-            'f3e2d4ad50bb4952652876d17f4ba71586e7b0cfe859f1610e635ada58e9a8de')
+            'f3e2d4ad50bb4952652876d17f4ba71586e7b0cfe859f1610e635ada58e9a8de'
+            '18ccb2827ad847592e3e8616583f340cc344c9bb62c80e75b18163839cd869a5')
 
 prepare() {
   #git clone https://github.com/petsc/petsc
@@ -76,7 +78,7 @@ prepare() {
   mv $srcdir/${_realname} $srcdir/build-${MSYSTEM}/${_realname}-${pkgver} 
   cd ${_realname}-${pkgver} 
   for p in ${source[*]:5}; do
-    patch -p1 -i "$srcdir/$p"
+    patch -p1 -i "$srcdir/$p" || true
   done
 }
 
@@ -98,7 +100,7 @@ _petsc() {
       ;;
   esac
   iflags=
-  ldflags="-lgfortran -lquadmath"
+  ldflags="-lgfortran -lquadmath -lmetis -lparmetis"
   desc=
   case $1 in
     ?m?)
@@ -171,7 +173,7 @@ build() {
   cd  "${srcdir}/build-${MSYSTEM}/${_realname}-${pkgver}"
   for build in ${builds}; do
     _petsc ${build}
-    export PETSC_DIR=`pwd`
+    export PETSC_DIR=`cygpath $(pwd)`
     /usr/bin/python configure --PETSC_ARCH=${build} ${opts} CFLAGS="$cflags" FFLAGS="$fflags" CXXFLAGS="$cxxflags" CPPFLAGS="$CPPFLAGS" LDFLAGS="$LDFLAGS" MAKEFLAGS="$MAKEFLAGS"
     make PETSC_ARCH=${build} all
   	(
@@ -179,10 +181,11 @@ build() {
   	  case ${build} in
     		*o) strip -S *.a ;;
   	  esac
-  		${ld} -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o lib${_realname}-${build}.dll  -Wl,--output-def,lib${_realname}-${build}.def -Wl,--out-implib,lib${_realname}.dll.a -Wl,--whole-archive lib${_realname}.a -Wl,--no-whole-archive ${ldflags} $(pkg-config ${pc} --libs)
+  		${ld} --verbose -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o lib${_realname}-${build}.dll  -Wl,--output-def,lib${_realname}-${build}.def -Wl,--out-implib,lib${_realname}.dll.a -Wl,--whole-archive lib${_realname}.a -Wl,--no-whole-archive ${ldflags} $(pkg-config ${pc} --libs)
 		# We specify the prefix for obects in the import library archive so
 		# to prevent msvc getting confused.
-		dlltool -d lib${_realname}-${build}.def --dllname lib${_realname}-${build}.dll --output-lib lib${_realname}-${build}.dll.a --temp-prefix ${_realname}-
+		gendef.exe lib${_realname}-${build}.dll
+		dlltool -d lib${_realname}-${build}.def --dllname lib${_realname}-${build}.dll --output-lib lib${_realname}.dll.a --temp-prefix ${_realname}-
   	)
   done
 }
