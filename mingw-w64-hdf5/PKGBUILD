@@ -27,11 +27,15 @@ options=('staticlibs' 'strip')
 source=("https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${_ver%.*}/hdf5-${_ver}${patch}/src/hdf5-${_ver}${patch}.tar.bz2"
 	"link_props.patch"
         "hdf5-proper-library-names-mingw.patch"
-        "hdf5-fix-find-szip.patch")
+        "hdf5-fix-find-szip.patch"
+	"dllexport_H5T.patch"
+)
 sha256sums=('aaf9f532b3eda83d3d3adc9f8b40a9b763152218fa45349c3bc77502ca1f8f1c'
 	    'SKIP'
             '7b5595ee9903e14f147f7b4615648cad6a0f5a76f8299461ebe91d739e750476'
-            '1a778a273225c36589b8874deb71caedbd76f2704ff39948b7a2b4d5f977b529')
+            '1a778a273225c36589b8874deb71caedbd76f2704ff39948b7a2b4d5f977b529'
+            'aaf62e20e54c4337e9b9540d623b8f91b9fb009c736e690bdebc19d5b32dcd26'
+)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
