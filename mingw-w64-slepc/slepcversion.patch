@@ -1,0 +1,11 @@
+--- a/include/slepcversion.h	2021-09-30 03:40:43.000000000 -0600
++++ b/include/slepcversion.h	2022-02-28 13:02:02.703608500 -0700
+@@ -11,7 +11,7 @@
+ #if !defined(SLEPCVERSION_H)
+ #define SLEPCVERSION_H
+ 
+-#define SLEPC_VERSION_RELEASE    1
++#define SLEPC_VERSION_RELEASE    0
+ #define SLEPC_VERSION_MAJOR      3
+ #define SLEPC_VERSION_MINOR      16
+ #define SLEPC_VERSION_SUBMINOR   0
