@@ -67,13 +67,13 @@ prepare() {
 }
 
 build() {
-  #. ${MINGW_PREFIX}/src/petsc-*/petsc
+  petscdir=$(readlink -en "${srcdir}/../../mingw-w64-petsc/pkg/mingw-w64-ucrt-x86_64-petsc-build/ucrt64/src/petsc-3.16.1")
+  . ${petscdir}/petsc
   cd  "${srcdir}/build-${MINGW_CHOST}/${_realname}-${pkgver}"
-  #for build in ${petsc_builds}; do
-    build='dmo'
+  for build in ${petsc_builds}; do
     export SLEPC_DIR=`pwd`
     export PETSC_ARCH=${build}
-    export PETSC_DIR="/c/Users/core/cf/master/deps/srcs/MINGW-packages/mingw-w64-petsc/pkg/mingw-w64-ucrt-x86_64-petsc-build/ucrt64/src/petsc-3.16.1"
+    export PETSC_DIR=${petscdir}
     /usr/bin/python configure
     make
   	(
@@ -86,9 +86,9 @@ build() {
 		lib='libslepc'
   		gcc -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o ${lib}-${build}.dll -Wl,--output-def,${lib}-${build}.def -Wl,--out-implib,${lib}.dll.a -Wl,--whole-archive ${lib}.a -Wl,--no-whole-archive $(pkg-config msmpi openblas petsc-${build} --libs)
 		gendef.exe ${lib}-${build}.dll
-		dlltool -d ${lib}-${build}.def --dllname ${lib}-${build}.dll --output-lib ${lib}-${build}.dll.a --temp-prefix $lib-
+		dlltool -d ${lib}-${build}.def --dllname ${lib}-${build}.dll --output-lib ${lib}.dll.a --temp-prefix $lib-
   	)
-  #done
+  done
 }
 
 package() {
@@ -110,8 +110,7 @@ package() {
     cd src/eps/tutorials
     cp ex1.c ex1f.F ${pkgdir}${MINGW_PREFIX}/share/test/${_realname}
   )
-#  for build in ${petsc_builds}; do
-    build='dmo'
+  for build in ${petsc_builds}; do
   	(
   		cd ${build}/lib
   		mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/${_realname}/${build}
@@ -121,7 +120,7 @@ package() {
   	(
   		cd ${build}/include
   		mkdir -p ${pkgdir}${MINGW_PREFIX}/include/${_realname}/${build}
-  		cp *.{h,mod} ${pkgdir}${MINGW_PREFIX}/include/${_realname}/${build}
+  		cp *.h ${pkgdir}${MINGW_PREFIX}/include/${_realname}/${build}
   	)
     case ${build} in
       ?m?) desc="MPI parallel";;
@@ -147,5 +146,5 @@ package() {
       Cflags: -I\${includedir}/${build} -I\${includedir}
       Libs: -L\${libdir}/${build} -l${_realname}
     " | sed '/^\s*$/d;s/^\s*//' > ${pkgdir}${MINGW_PREFIX}/lib/pkgconfig/${_realname}-${build}.pc
-#  done
+  done
 }

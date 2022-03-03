@@ -100,7 +100,7 @@ _petsc() {
       ;;
   esac
   iflags=
-  ldflags="-lgfortran -lquadmath -lmetis -lparmetis"
+  ldflags="-lgfortran -lquadmath -lmetis"
   desc=
   case $1 in
     ?m?)
