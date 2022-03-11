@@ -43,7 +43,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-openblas"
          "${MINGW_PACKAGE_PREFIX}-parmetis"
          "${MINGW_PACKAGE_PREFIX}-metis"
-	 "${MINGW_PACKAGE_PREFIX}-superlu"
+	 "${MINGW_PACKAGE_PREFIX}-superlu_dist"
          "${MINGW_PACKAGE_PREFIX}-hwloc"
          "${MINGW_PACKAGE_PREFIX}-msmpi")
 makedepends=('python'
@@ -104,8 +104,8 @@ _petsc() {
   desc=
   case $1 in
     ?m?)
-      opts="$opts --with-mpi=1 --with-mpi-compilers=1 --with-pthread=0 --with-openmp=0 --with-metis=1 --with-parmetis=0 --with-superlu=1 --with-superlu-include=$MINGW_PREFIX/include/superlu --with-superlu-lib=$MINGW_PREFIX/lib/libsuperlu.dll.a"
-      pc="$pc msmpi superlu"
+      opts="$opts --with-mpi=1 --with-mpi-compilers=1 --with-pthread=0 --with-openmp=0 --with-metis=1 --with-parmetis=0 --with-superlu_dist=1 --with-superlu_dist-include=$MINGW_PREFIX/include/superlu_dist --with-superlu_dist-lib=$MINGW_PREFIX/lib/libsuperlu_dist.dll.a"
+      pc="$pc msmpi superlu_dist"
       ld=mpicxx
       desc="MPI parallel"
     ;;
