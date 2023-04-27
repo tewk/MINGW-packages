@@ -27,8 +27,9 @@
 _realname=slepc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=3.16.0
-petsc_pkgver=3.16
+pkgver=3.17.2
+petsc_pkgver=3.17
+petsc_ver=3.17.5
 pkgrel=1
 arch=('any')
 mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64')
@@ -46,14 +47,16 @@ source=("https://slepc.upv.es/download/distrib/${_realname}-${pkgver}.tar.gz"
         'all.tcl'
         'tclbuildtest.tcl'
         'slepc.test'
-	'slepcversion.patch'
+	#'slepcversion.patch'
 )
 noextract=("${_realname}-${pkgver}.tar.gz")
-sha256sums=('be7292b85430e52210eb389c4f434b67164e96d19498585e82d117e850d477f4'
+sha256sums=(#'be7292b85430e52210eb389c4f434b67164e96d19498585e82d117e850d477f4'
+            #3.16.3'3b92bd170632a3de4d779f3f0697e7cb9b663e2c34606c9e97d899d7c1868014e'
+            'f784cca83a14156631d6e0f5726ca0778e259e1fe40c927607d5fb12d958d705'
             'ec5072630e1c0309fe383669e9187790cd135a393c67bc4bc35cf60b0ba396ff'
             '15c7af25b91406d5fe5f26cfe00963b6cfde1c3dd466eb25f1b6fae299934966'
             '47237bd53f15e9d204b7c871ef887d9b6d11e0add1409a6eeb1a122f4b302265'
-            '9b2b03a7360410923f1fbc7f160dade5e38457fb81e29dff9e9207d3242c7b2b'
+            #'9b2b03a7360410923f1fbc7f160dade5e38457fb81e29dff9e9207d3242c7b2b'
 )
 
 prepare() {
@@ -67,7 +70,7 @@ prepare() {
 }
 
 build() {
-  petscdir=$(readlink -en "${srcdir}/../../mingw-w64-petsc/pkg/mingw-w64-ucrt-x86_64-petsc-build/ucrt64/src/petsc-3.16.1")
+  petscdir=$(readlink -en "${srcdir}/../../mingw-w64-petsc/pkg/mingw-w64-ucrt-x86_64-petsc-build/ucrt64/src/petsc-${petsc_ver}")
   . ${petscdir}/petsc
   cd  "${srcdir}/build-${MINGW_CHOST}/${_realname}-${pkgver}"
   for build in ${petsc_builds}; do
@@ -84,7 +87,7 @@ build() {
   		#gcc -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o lib${_realname}-${build}.dll -Wl,--out-implib,lib${_realname}.dll.a -Wl,--whole-archive lib${_realname}.a -Wl,--no-whole-archive $(pkg-config msmpi openblas petsc-${build} --libs)
   		#ar crsT ${lib}.a libslepcnep.a libslepcpep.a libslepcsvd.a libslepceps.a libslepcmfn.a libslepclme.a libslepcsys.a
 		lib='libslepc'
-  		gcc -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o ${lib}-${build}.dll -Wl,--output-def,${lib}-${build}.def -Wl,--out-implib,${lib}.dll.a -Wl,--whole-archive ${lib}.a -Wl,--no-whole-archive $(pkg-config msmpi openblas petsc-${build} --libs)
+		gcc -shared -Wl,--enable-auto-import -Wl,--export-all-symbols -o ${lib}-${build}.dll -Wl,--output-def,${lib}-${build}.def -Wl,--out-implib,${lib}.dll.a -Wl,--whole-archive ${lib}.a -Wl,--no-whole-archive $(pkg-config msmpi openblas scalapack petsc-${build} --libs)
 		gendef.exe ${lib}-${build}.dll
 		dlltool -d ${lib}-${build}.def --dllname ${lib}-${build}.dll --output-lib ${lib}.dll.a --temp-prefix $lib-
   	)
