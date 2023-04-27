@@ -32,7 +32,7 @@
 _realname=petsc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}" "${MINGW_PACKAGE_PREFIX}-${_realname}-build")
-pkgver=3.16.1
+pkgver=3.17.5
 pkgrel=1
 arch=('any')
 mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64')
@@ -45,7 +45,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-metis"
 	 "${MINGW_PACKAGE_PREFIX}-superlu_dist"
          "${MINGW_PACKAGE_PREFIX}-hwloc"
-         "${MINGW_PACKAGE_PREFIX}-msmpi")
+         "${MINGW_PACKAGE_PREFIX}-msmpi"
+         "${MINGW_PACKAGE_PREFIX}-mumps")
 makedepends=('python'
              "${MINGW_PACKAGE_PREFIX}-cc"
              "${MINGW_PACKAGE_PREFIX}-gcc-fortran")
@@ -53,29 +54,35 @@ optdepends=("${MINGW_PACKAGE_PREFIX}-tcl: build & run test suite")
 options=('strip' 'staticlibs')
 license=('2-clause BSD')
 url="https://www.mcs.anl.gov/petsc/"
-source=("git+https://gitlab.com/petsc/petsc.git"
+source=(#"git+https://gitlab.com/petsc/petsc.git"
 	#"https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/${_realname}-lite-${pkgver}.tar.gz"
+	"https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/${_realname}-${pkgver}.tar.gz"
         'all.tcl'
         'tclbuildtest.tcl'
         'petsc.test'
         'petsc-mat.test'
         '0001-mpi-detection-override.patch'
-        'disable_mpi_call_counting.patch')
+        'disable_mpi_call_counting_3_17.patch')
+        #3.16'disable_mpi_call_counting.patch')
 noextract=("${_realname}-lite-${pkgver}.tar.gz")
-sha256sums=('SKIP'
-	    #'909cf7bce7b6a0ddb2580a1ac9502aa01631ec4105c716594c1804f0ee1ea06a'
+sha256sums=(#'SKIP'
+	    #3.16.1'909cf7bce7b6a0ddb2580a1ac9502aa01631ec4105c716594c1804f0ee1ea06a'
+            #3.16.5'7de8570eeb94062752d82a83208fc2bafc77b3f515023a4c14d8ff9440e66cac'
+            'a1193e6c50a1676c3972a1edf0a06eec9fac8ecc2f3771f2689a8997423e4c71'
             'ec5072630e1c0309fe383669e9187790cd135a393c67bc4bc35cf60b0ba396ff'
             '15c7af25b91406d5fe5f26cfe00963b6cfde1c3dd466eb25f1b6fae299934966'
             '9662cc4104726c714f7961aba6f8c93bfb85f3d3f89b4908b0a55aedab41ca31'
             'fc95ca4ddc138d288f047835a68a84a11cb841c6cca146c6ef7d7e63e0836b1a'
             'f3e2d4ad50bb4952652876d17f4ba71586e7b0cfe859f1610e635ada58e9a8de'
-            '18ccb2827ad847592e3e8616583f340cc344c9bb62c80e75b18163839cd869a5')
+            'e14e5ed7aa25c6592b2c812d210e46755ec57b4370b8eea47874baf8a03dd556')
+            #3.16 mpi patch '18ccb2827ad847592e3e8616583f340cc344c9bb62c80e75b18163839cd869a5')
 
 prepare() {
   #git clone https://github.com/petsc/petsc
   mkdir -p $srcdir/build-${MSYSTEM} && cd $srcdir/build-${MSYSTEM}
   #tar xzf $srcdir/${_realname}-lite-${pkgver}.tar.gz
-  mv $srcdir/${_realname} $srcdir/build-${MSYSTEM}/${_realname}-${pkgver} 
+  #mv $srcdir/${_realname} $srcdir/build-${MSYSTEM}/${_realname}-${pkgver}
+  mv $srcdir/${_realname}-${pkgver} $srcdir/build-${MSYSTEM}/${_realname}-${pkgver}
   cd ${_realname}-${pkgver} 
   for p in ${source[*]:5}; do
     patch -p1 -i "$srcdir/$p" || true
@@ -124,9 +131,9 @@ _petsc() {
   case $1 in
          dmo)
             ## no fortran bindings so we can build against fortran packages like mumps but without having to use sowing = (--with-fortran-bindings=0)
-            #opts="$opts --with-mumps=1 --with-mumps-include=$MINGW_PREFIX/include/ --with-mumps-lib=$MINGW_PREFIX/lib/libmumps-dmo.dll.a --with-scalapack=1 --with-fortran-bindings=0"
-            #pc="$pc mumps-dmo scalapack"
-            opts="$opts --with-fortran-bindings=0"
+            opts="$opts --with-mumps=1 --with-mumps-include=$MINGW_PREFIX/include/ --with-mumps-lib=$MINGW_PREFIX/lib/libmumps-dmo.dll.a --with-scalapack=1 --with-fortran-bindings=0"
+            pc="$pc mumps-dmo scalapack"
+            #opts="$opts --with-fortran-bindings=0"
             desc="DMO specific config"
   
          ;;
