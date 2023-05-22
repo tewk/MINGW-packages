@@ -131,7 +131,7 @@ _petsc() {
   case $1 in
          dmo)
             ## no fortran bindings so we can build against fortran packages like mumps but without having to use sowing = (--with-fortran-bindings=0)
-            opts="$opts --with-mumps=1 --with-mumps-include=$MINGW_PREFIX/include/ --with-mumps-lib=$MINGW_PREFIX/lib/libmumps-dmo.dll.a --with-scalapack=1 --with-fortran-bindings=0"
+            opts="$opts --with-mumps=1 --download-mumps --with-scalapack=1 --with-fortran-bindings=0"
             pc="$pc mumps-dmo scalapack"
             #opts="$opts --with-fortran-bindings=0"
             desc="DMO specific config"
